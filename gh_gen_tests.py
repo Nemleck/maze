@@ -2,7 +2,7 @@ from gh_generator_classes import Maze
 import json
 
 # Maze dimensions (ncols, nrows)
-nx, ny = 20, 20
+nx, ny = 3, 4
 # Maze entry position
 ix, iy = 0, 0
 
@@ -23,7 +23,7 @@ for i in range(len(maze_list)):
 with open("maze.json", "w") as f:
     maze_listII[0][0] = 2
     maze_listII[-1][-1] = 3
-    f.write(json.dumps(maze_listII, indent=1))
+    f.write(json.dumps(maze_listII).replace("], [","],\n["))
 
 # print(str(maze_listII).replace(", ",",").replace("],[","],\n   [").replace("[[","[\n   [").replace("]]","]\n]").replace("'",""))
 

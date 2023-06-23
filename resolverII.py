@@ -1,17 +1,38 @@
 from copy import deepcopy
 import json
+from enum import Enum
+
+class Maze(Enum):
+    GROUND = 0
+    WALL = 1
+    START = 2
+    ARRIVAL = 3
+
+class Analysed(Enum):
+    NOT_ANALYSED = 0
+    ANALYSED = 1
+
+class Solution(Enum):
+    START = 0
+    ARRIVAL = 0
+    WALL = -1
 
 def show(mazes):
     for solution in mazes:
             text = ""
             for y in range(len(solution)):
-                for place in solution[y]:
-                    if place == -1:
+                for place_i in range(len(solution[y])):
+                    place = solution[y][place_i]
+
+                    if place == -1: # show analysed walls
                         text += "🟨"
-                    elif place == 0:
+                    elif maze[y][place_i] == Maze.WALL: # show other walls
+                        text += "🟦"
+                    elif place == Maze.GROUND:
                         text += "🟩"
                     elif type(place) is int and place >= 1:
-                        text += "⬛"
+                        text += f"{place:2}"
+                        # text += "⬛"
                     else:
                         text += "🟫"
                 text += "\n"
@@ -28,16 +49,16 @@ start_pos = (0, 0)
 end_pos = (4, 4)
 for y in range(len(maze)):
     for x in range(len(maze[y])):
-        if maze[y][x] == 2:
+        if maze[y][x] == Maze.START:
             start_pos = (x, y)
-        elif maze[y][x] == 3:
+        elif maze[y][x] == Maze.ARRIVAL:
             end_pos = (x, y)
 
 temp_analysed = deepcopy(empty_maze)
-temp_analysed[start_pos[1]][start_pos[0]] = 1
+temp_analysed[start_pos[1]][start_pos[0]] = Analysed.ANALYSED
 
 temp_solution = deepcopy(empty_maze)
-temp_solution[start_pos[1]][start_pos[0]] = 0
+temp_solution[start_pos[1]][start_pos[0]] = Solution.START
 
 curr_solutions = [{
      "place": start_pos,
@@ -68,22 +89,20 @@ while not finished:
                 t_sol["solution"][new_y][new_x] = t_sol["solution"][place[1]][place[0]]+1
                 t_sol["place"] = (new_x, new_y)
 
-                if maze[new_y][new_x] == 1: #wall ?
+                if maze[new_y][new_x] == Maze.WALL: #wall ?
                     for elm in curr_solutions:
                         elm["solution"][new_y][new_x] = -1
 
-                elif maze[new_y][new_x] == 0: #path ?
+                elif maze[new_y][new_x] == Maze.GROUND: #path ?
                     curr_solutions.append(t_sol)
                 
-                elif maze[new_y][new_x] == 3: #goal ?
-                    t_sol["solution"][new_y][new_x] = 0
-                    final_solutions.append(t_sol)
+                elif maze[new_y][new_x] == Maze.ARRIVAL: #goal ?
+                    t_sol["solution"][new_y][new_x] = Solution.ARRIVAL
+                    final_solutions.append(t_sol) # then append the solution to final_solutions
 
         curr_solutions.pop(0)
 
         if len(curr_solutions) > 0:
-            # show([elm["solution"] for elm in curr_solutions])
-            # show([elm["analysed"] for elm in curr_solutions])
             pass
         else:
             finished = True
