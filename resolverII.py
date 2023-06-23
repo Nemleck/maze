@@ -1,37 +1,36 @@
 from copy import deepcopy
 import json
-from enum import Enum
+from enum import IntEnum
 
-class Maze(Enum):
+class Maze(IntEnum):
     GROUND = 0
     WALL = 1
     START = 2
     ARRIVAL = 3
 
-class Analysed(Enum):
+class Analysed(IntEnum):
     NOT_ANALYSED = 0
     ANALYSED = 1
 
-class Solution(Enum):
-    START = 0
-    ARRIVAL = 0
+class Solution(IntEnum):
+    START_OR_ARRIVAL = 0
     WALL = -1
 
 def show(mazes):
-    for solution in mazes:
+    for maze in mazes:
             text = ""
-            for y in range(len(solution)):
-                for place_i in range(len(solution[y])):
-                    place = solution[y][place_i]
+            for row in range(len(maze)):
+                for col in range(len(maze[row])):
+                    value = maze[row][col]
 
-                    if place == -1: # show analysed walls
+                    if value == Solution.WALL: # show analysed walls
                         text += "🟨"
-                    elif maze[y][place_i] == Maze.WALL: # show other walls
+                    elif maze[row][col] == Maze.WALL: # show other walls
                         text += "🟦"
-                    elif place == Maze.GROUND:
+                    elif value == Solution.START_OR_ARRIVAL:
                         text += "🟩"
-                    elif type(place) is int and place >= 1:
-                        text += f"{place:2}"
+                    elif type(value) is int and value >= 1:
+                        text += f"{value:2}"
                         # text += "⬛"
                     else:
                         text += "🟫"
@@ -58,7 +57,7 @@ temp_analysed = deepcopy(empty_maze)
 temp_analysed[start_pos[1]][start_pos[0]] = Analysed.ANALYSED
 
 temp_solution = deepcopy(empty_maze)
-temp_solution[start_pos[1]][start_pos[0]] = Solution.START
+temp_solution[start_pos[1]][start_pos[0]] = Solution.START_OR_ARRIVAL
 
 curr_solutions = [{
      "place": start_pos,
@@ -97,7 +96,7 @@ while not finished:
                     curr_solutions.append(t_sol)
                 
                 elif maze[new_y][new_x] == Maze.ARRIVAL: #goal ?
-                    t_sol["solution"][new_y][new_x] = Solution.ARRIVAL
+                    t_sol["solution"][new_y][new_x] = Solution.START_OR_ARRIVAL
                     final_solutions.append(t_sol) # then append the solution to final_solutions
 
         curr_solutions.pop(0)
